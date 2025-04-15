@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Utility\Error;
 use Psr\Log\LoggerInterface;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 
 /**
  * The default CKEditor Media Embed class.
@@ -106,21 +107,31 @@ class Embed implements EmbedInterface {
    *   The current path service.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Psr\Log\LoggerInterface $logger
-   *   The logger.
+   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
+   *   The logger factory.
    */
-  public function __construct(ClientInterface $http_client, UnroutedUrlAssemblerInterface $url_assembler, RequestStack $request_stack, MessengerInterface $messenger, ConfigFactory $config_factory, CurrentPathStack $current_path, ModuleHandlerInterface $module_handler, LoggerInterface $logger) {
+  public function __construct(ClientInterface $http_client, UnroutedUrlAssemblerInterface $url_assembler, RequestStack $request_stack, MessengerInterface $messenger, ConfigFactory $config_factory, CurrentPathStack $current_path, ModuleHandlerInterface $module_handler, LoggerChannelFactoryInterface $logger_factory) {
     $this->httpClient = $http_client;
     $this->urlAssembler = $url_assembler;
     $this->requestStack = $request_stack;
-    $this->configFactory = $config_factory;
     $this->messenger = $messenger;
+    $this->configFactory = $config_factory;
     $this->currentPath = $current_path;
     $this->moduleHandler = $module_handler;
-    $this->logger = $logger;
+    $this->logger = $logger_factory->get('ckeditor_media_embed');
 
     $embed_provider = $this->configFactory->get('ckeditor_media_embed.settings')->get('embed_provider');
     $this->setEmbedProvider($embed_provider);
+  }
+
+  /**
+   * Sets the logger for this service.
+   *
+   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
+   *   The logger factory.
+   */
+  public function setLogger(LoggerChannelFactoryInterface $logger_factory) {
+    $this->logger = $logger_factory->get('ckeditor_media_embed');
   }
 
   /**

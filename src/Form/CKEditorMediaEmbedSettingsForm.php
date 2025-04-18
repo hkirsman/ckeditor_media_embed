@@ -7,6 +7,7 @@ use Drupal\ckeditor_media_embed\AssetManager;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Asset\LibraryDiscoveryInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Extension\ModuleHandler;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -46,6 +47,8 @@ class CKEditorMediaEmbedSettingsForm extends ConfigFormBase {
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
+   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config_manager
+   *   The typed config manager.
    * @param \Drupal\Core\Extension\ModuleHandler $module_handler
    *   The module handler.
    * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
@@ -54,8 +57,8 @@ class CKEditorMediaEmbedSettingsForm extends ConfigFormBase {
    *   The library discovery service to use for retrieving information about
    *   the CKeditor library.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, ModuleHandler $module_handler, UrlGeneratorInterface $url_generator, LibraryDiscoveryInterface $library_discovery) {
-    parent::__construct($config_factory);
+  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typed_config_manager, ModuleHandler $module_handler, UrlGeneratorInterface $url_generator, LibraryDiscoveryInterface $library_discovery) {
+    parent::__construct($config_factory, $typed_config_manager);
 
     $this->urlGenerator = $url_generator;
     $this->moduleHandler = $module_handler;
@@ -68,6 +71,7 @@ class CKEditorMediaEmbedSettingsForm extends ConfigFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('config.factory'),
+      $container->get('config.typed'),
       $container->get('module_handler'),
       $container->get('url_generator'),
       $container->get('library.discovery')
